@@ -7,14 +7,14 @@ from hazelcast.util import validate_serializer
 def pessimistic_blocking():
     client = hazelcast.HazelcastClient()
     map = client.get_map("my-distributed-map").blocking()
+
     key = 1
-    map.put(key,0)
-    for i in range(15):
+    for i in range(100):
         print('i: ', i)
         map.lock(key)
         
         value = map.get(key)
-        time.sleep(10)
+        time.sleep(0.5)
         value += 1
         map.put(key, value)
         map.unlock(key)

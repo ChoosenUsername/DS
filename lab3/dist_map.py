@@ -5,8 +5,8 @@ client = hazelcast.HazelcastClient()
 # Get the Distributed Map from Cluster.
 my_map = client.get_map("my-distributed-map").blocking()
 
-for i in range(15):
-    my_map.put(i,2*i)
+#for i in range(100):
+my_map.put(1,0)
     
 print("finished")
 client.shutdown()
