@@ -3,9 +3,7 @@ import pika
 import time
 
 connection = pika.BlockingConnection(
-    pika.ConnectionParameters(host='localhost', port=5672))
-
-
+    pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
 
 channel.queue_declare(queue='task_queue', durable=True)
@@ -13,6 +11,10 @@ print(' [*] Waiting for messages. To exit press CTRL+C')
 
 
 def callback(ch, method, properties, body):
+    with open("sample2.txt", "a") as file_object:
+    # Append 'hello' at the end of file
+        file_object.write(body.decode() + ",")
+
     print(" [x] Received %r" % body.decode())
     time.sleep(body.count(b'.'))
     print(" [x] Done")
