@@ -10,7 +10,7 @@ import hazelcast
 
 app = Flask(__name__)
 api = Api(app)
-port = 5506
+port = 5001
 
 
 client = hazelcast.HazelcastClient(
