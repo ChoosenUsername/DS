@@ -9,7 +9,7 @@ import hazelcast
 
 app = Flask(__name__)
 api = Api(app)
-port = 5507
+port = 5002
 
 client = hazelcast.HazelcastClient(
         cluster_members=["192.168.1.102:5702"]
