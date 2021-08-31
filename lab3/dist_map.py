@@ -6,7 +6,7 @@ client = hazelcast.HazelcastClient()
 my_map = client.get_map("my-distributed-map").blocking()
 
 #for i in range(100):
-my_map.put(1,0)
-    
+my_map.delete(1)
+
 print("finished")
 client.shutdown()

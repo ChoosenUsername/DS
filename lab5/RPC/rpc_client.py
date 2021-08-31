@@ -27,6 +27,8 @@ class FibonacciRpcClient(object):
     def call(self, n):
         self.response = None
         self.corr_id = str(uuid.uuid4())
+
+        
         try:
             self.channel.basic_publish(
                 exchange='',
@@ -39,7 +41,10 @@ class FibonacciRpcClient(object):
             print('Message publish was confirmed')
         except:
             print('Message could not be confirmed')
-
+        
+        
+        
+        
         while self.response is None:
             self.connection.process_data_events()
         return int(self.response)
