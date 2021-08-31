@@ -1,7 +1,5 @@
-import time
-
 import pika
-from flask import Flask, request, jsonify
+from flask import Flask
 
 from facade import queue_name
 from multiprocessing import Process, Manager
@@ -20,22 +18,23 @@ def consume(final_list):
     channel.basic_consume(queue=queue_name, on_message_callback=callback_, auto_ack=True)
     channel.start_consuming()
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def message_f():
-    global total_str1
-    if request.method == 'POST':
-        manager = Manager()
-        final_list = manager.list()
-        p1 = Process(target=consume, args=(final_list,))
-        p1.start()
-        time.sleep(3)
-        p1.terminate()
-        total_str1 += final_list
-        return jsonify({"is_success": True})
 
-    if request.method == 'GET':
-        return " ".join(total_str1)
+    print(" ".join(total_str1))
+    return " ".join(total_str1)
 
 
 if __name__ == "__main__":
-    app.run(port=5010)
+
+   
+    manager = Manager()
+    final_list = manager.list()
+    p1 = Process(target=consume, args=(final_list,))
+    p1.start()
+    
+    total_str1 = final_list
+    p2 =Process( app.run(port=5010))
+    p2.start()
+
+

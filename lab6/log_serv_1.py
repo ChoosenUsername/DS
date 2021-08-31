@@ -1,10 +1,5 @@
 from flask import Flask, request
-from flask_restful import Resource, Api
-import sys
-import os
-import uuid
-import requests
-import json
+from flask_restful import Api
 import hazelcast
 
 
