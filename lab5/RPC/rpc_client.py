@@ -28,6 +28,7 @@ class FibonacciRpcClient(object):
         self.response = None
         self.corr_id = str(uuid.uuid4())
 
+        
         try:
             self.channel.basic_publish(
                 exchange='',
@@ -36,10 +37,14 @@ class FibonacciRpcClient(object):
                     reply_to=self.callback_queue,
                     correlation_id=self.corr_id,
                 ),
+                body=str(n))
             print('Message publish was confirmed')
-        except pika.exceptions.UnroutableError:
+        except:
             print('Message could not be confirmed')
-        body=str(n))
+        
+        
+        
+        
         while self.response is None:
             self.connection.process_data_events()
         return int(self.response)
