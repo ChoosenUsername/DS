@@ -1,9 +1,7 @@
-import copy
-import json
 import random
 import uuid
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import requests as rq
 import pika
 queue_name = 'main_queue'
@@ -19,43 +17,40 @@ unique_id = 0
 
 
 
-@app.route('/', methods=['GET', 'POST'])
-def user():
-    if request.method == 'POST':
+@app.route('/', methods=['POST'])
+def send():
 
-        data = request.args["msg"]
+    data = request.args["msg"]
 
-        #logging logic
-        id = str(uuid.uuid1())
-        dictToSend = {"message": data, "uuid":id}
-        print(dictToSend)
-        res = rq.post('http://127.0.0.1:'+random.choice(ports1)+'/', params=dictToSend)
+    #logging logic
+    id = str(uuid.uuid1())
+    dictToSend = {"message": data, "uuid":id}
+    print(dictToSend)
+    res = rq.post('http://127.0.0.1:'+random.choice(ports1)+'/', params=dictToSend)
 
-        #messaging logic
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-        channel = connection.channel()
-        channel.queue_declare(queue=queue_name)
+    #messaging logic
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue=queue_name)
 
-        message_http = 'http://localhost:' +  random.choice(ports2) + '/'
-        channel.basic_publish(exchange="", routing_key=queue_name, body=data)
-        rq.post(message_http, json=None)
+    channel.basic_publish(exchange="", routing_key=queue_name, body=data)
 
-        return "done"
-    
-    if request.method == 'GET':
+    return "done"
+
+
+@app.route('/', methods=['GET'])
+def receive():
+
+    #get messages from logs
+    responce_log = rq.get('http://127.0.0.1:5001/')
+    print("from logs: " + responce_log.json()["msg"])
+
+    # get messages from message servers
+    results_message = rq.get("http://localhost:" + random.choice(ports2) + "/") 
+    print("from message " + results_message.text)
         
-        #get messages from logs
-        responce_log = rq.get('http://127.0.0.1:5001/')
-        print("from logs: " + responce_log.json()["msg"])
-
-        # get messages from message servers
-        results_message1 = rq.get("http://localhost:5010/")
-        results_message2 = rq.get("http://localhost:5005/")
-        print("from message1 " + results_message1.text)
-        print("from message2 " + results_message2.text)
-
-        results_message = results_message1.text + results_message2.text + responce_log.json()["msg"]
-        return results_message
+    results_message = results_message.text + responce_log.json()["msg"]
+    return results_message
 
 
 if __name__ == "__main__":
